@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador 3ª Lei de Kepler</title>
+</head>
+<body style="margin: 0; padding: 20px; background: #000; font-family: Arial, sans-serif;">
+
+<h1 style="text-align: center; color: white; margin-bottom: 30px;">Simulador: Terceira Lei de Kepler - Lei dos Períodos</h1>
+
+<div style="background: #000; padding: 30px; border-radius: 10px;">
+    
+    <canvas id="canvas3LeiKepler" width="1400" height="1000" style="display: block; margin: 0 auto 20px; border: 2px solid #667eea; border-radius: 10px; background: #000; max-width: 100%;"></canvas>
+    
+    <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 10px; color: white;">
+            <div style="width: 15px; height: 15px; border-radius: 50%; background: #8B7355;"></div>
+            <span>Mercúrio</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 10px; color: white;">
+            <div style="width: 15px; height: 15px; border-radius: 50%; background: #FFA500;"></div>
+            <span>Vênus</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 10px; color: white;">
+            <div style="width: 15px; height: 15px; border-radius: 50%; background: #4A90E2;"></div>
+            <span>Terra</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 10px; color: white;">
+            <div style="width: 15px; height: 15px; border-radius: 50%; background: #DC143C;"></div>
+            <span>Marte</span>
+        </div>
+
+    </div>
+    
+    <div style="text-align: center; margin: 25px 0;">
+        <button onclick="iniciar3Lei()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1em; margin: 8px;">▶️ Iniciar</button>
+        <button onclick="pausar3Lei()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1em; margin: 8px;">⏸️ Pausar</button>
+        <button onclick="resetar3Lei()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1em; margin: 8px;">🔄 Reiniciar</button>
+        <br>
+        <button onclick="mudarVelocidade3Lei(-2)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1em; margin: 8px;">Mais Lento</button>
+        <span style="display: inline-block; background: rgba(255,255,255,0.1); color: white; padding: 14px 30px; border-radius: 10px; font-size: 1.1em; margin: 8px; min-width: 80px;">Velocidade <span id="velocidade3Lei">5x</span></span>
+        <button onclick="mudarVelocidade3Lei(2)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; font-size: 1.1em; margin: 8px;">Mais Rápido</button>
+    </div>
+    
+    <div style="background: rgba(255,255,255,0.95); color: #333; padding: 25px; border-radius: 10px; margin: 20px 0;">
+        <h4 style="color: #667eea; margin-bottom: 20px; font-size: 1.3em;">📊 Dados dos Planetas (Escala Real)</h4>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+            <div style="padding: 12px; border-radius: 8px; background: rgba(139,115,85,0.15); border-left: 4px solid #8B7355;">
+                <strong style="color: #8B7355;">☿ Mercúrio</strong><br>
+                <span style="font-size: 0.9em;">58M km | 88 dias</span><br>
+                <strong>Voltas: <span id="voltasMercurio" style="color: #8B7355;">0</span></strong>
+            </div>
+            
+            <div style="padding: 12px; border-radius: 8px; background: rgba(255,165,0,0.15); border-left: 4px solid #FFA500;">
+                <strong style="color: #FFA500;">♀ Vênus</strong><br>
+                <span style="font-size: 0.9em;">108M km | 225 dias</span><br>
+                <strong>Voltas: <span id="voltasVenus" style="color: #FFA500;">0</span></strong>
+            </div>
+            
+            <div style="padding: 12px; border-radius: 8px; background: rgba(74,144,226,0.15); border-left: 4px solid #4A90E2;">
+                <strong style="color: #4A90E2;">🌍 Terra</strong><br>
+                <span style="font-size: 0.9em;">150M km | 365 dias</span><br>
+                <strong>Voltas: <span id="voltasTerra" style="color: #4A90E2;">0</span></strong>
+            </div>
+            
+            <div style="padding: 12px; border-radius: 8px; background: rgba(220,20,60,0.15); border-left: 4px solid #DC143C;">
+                <strong style="color: #DC143C;">♂ Marte</strong><br>
+                <span style="font-size: 0.9em;">228M km | 687 dias</span><br>
+                <strong>Voltas: <span id="voltasMarte" style="color: #DC143C;">0</span></strong>
+            </div>
+            
+
+        </div>
+        
+        <div style="margin-top: 20px; padding: 20px; background: rgba(255,243,205,0.8); border-radius: 8px; border-left: 4px solid #ffc107;">
+            <h4 style="color: #333; margin-bottom: 10px;">🔬 3ª Lei de Kepler: T² ∝ a³</h4>
+            <p style="margin: 5px 0; color: #333; font-size: 0.95em;">
+                <strong>O quadrado do período orbital é proporcional ao cubo da distância média do Sol.</strong>
+            </p>
+            <p style="margin: 10px 0 0 0; color: #555; font-size: 0.9em;">
+                💡 Marte está apenas 1,5× mais longe que a Terra, mas leva quase 2 anos para completar uma órbita!
+            </p>
+        </div>
+    </div>
+    
+
+    
+</div>
+
+<script>
+const dados3Lei = {
+    canvas: null,
+    ctx: null,
+    animando: false,
+    animId: null,
+    tempo: 0,
+    velocidade: 10,
+    planetas: [
+        { nome: 'Mercúrio', distancia: 58, periodo: 88, cor: '#8B7355', tamanho: 8, angulo: 0, voltas: 0, voltasAnterior: -1 },
+        { nome: 'Vênus', distancia: 108, periodo: 225, cor: '#FFA500', tamanho: 12, angulo: 0, voltas: 0, voltasAnterior: -1 },
+        { nome: 'Terra', distancia: 150, periodo: 365, cor: '#4A90E2', tamanho: 12, angulo: 0, voltas: 0, voltasAnterior: -1 },
+        { nome: 'Marte', distancia: 228, periodo: 687, cor: '#DC143C', tamanho: 10, angulo: 0, voltas: 0, voltasAnterior: -1 }
+    ],
+    solX: 0,
+    solY: 0,
+    escala: 2.5
+};
+
+function inicializar3Lei() {
+    dados3Lei.canvas = document.getElementById('canvas3LeiKepler');
+    if (!dados3Lei.canvas) {
+        setTimeout(inicializar3Lei, 100);
+        return;
+    }
+    
+    dados3Lei.ctx = dados3Lei.canvas.getContext('2d');
+    dados3Lei.solX = dados3Lei.canvas.width / 2;
+    dados3Lei.solY = dados3Lei.canvas.height / 2;
+    
+    desenhar3Lei();
+}
+
+function desenharEstrelas3Lei(ctx, w, h) {
+    // Estrelas removidas
+}
+
+function desenharSol3Lei(ctx, x, y) {
+    ctx.fillStyle = '#FDB813';
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = '#FDB813';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    
+    for (let i = 0; i < 12; i++) {
+        const ang = i * Math.PI / 6 + dados3Lei.tempo * 0.001;
+        ctx.strokeStyle = 'rgba(253,184,19,0.4)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.cos(ang) * 35, y + Math.sin(ang) * 35);
+        ctx.stroke();
+    }
+}
+
+function desenhar3Lei() {
+    if (!dados3Lei.ctx) return;
+    
+    const ctx = dados3Lei.ctx;
+    const w = dados3Lei.canvas.width;
+    const h = dados3Lei.canvas.height;
+    
+    ctx.clearRect(0, 0, w, h);
+    desenharEstrelas3Lei(ctx, w, h);
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 1.5;
+    dados3Lei.planetas.forEach(planeta => {
+        ctx.beginPath();
+        ctx.arc(dados3Lei.solX, dados3Lei.solY, planeta.distancia * dados3Lei.escala, 0, Math.PI * 2);
+        ctx.stroke();
+    });
+    
+    dados3Lei.planetas.forEach(planeta => {
+        const px = dados3Lei.solX + Math.cos(planeta.angulo) * planeta.distancia * dados3Lei.escala;
+        const py = dados3Lei.solY + Math.sin(planeta.angulo) * planeta.distancia * dados3Lei.escala;
+        
+        ctx.fillStyle = planeta.cor;
+        ctx.beginPath();
+        ctx.arc(px, py, planeta.tamanho, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(px, py, planeta.tamanho + 1.5, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 5;
+        ctx.fillText(planeta.nome, px, py - planeta.tamanho - 8);
+        ctx.shadowBlur = 0;
+    });
+    
+    desenharSol3Lei(ctx, dados3Lei.solX, dados3Lei.solY);
+}
+
+function animar3Lei() {
+    if (!dados3Lei.animando) return;
+    
+    desenhar3Lei();
+    
+    dados3Lei.planetas.forEach((planeta, index) => {
+        const velocidadeAngular = (2 * Math.PI / planeta.periodo) * dados3Lei.velocidade * 0.5;
+        planeta.angulo += velocidadeAngular;
+        
+        const voltasAtuais = Math.floor(planeta.angulo / (2 * Math.PI));
+        if (voltasAtuais !== planeta.voltasAnterior) {
+            planeta.voltas = voltasAtuais;
+            planeta.voltasAnterior = voltasAtuais;
+            
+            const ids = ['voltasMercurio', 'voltasVenus', 'voltasTerra', 'voltasMarte'];
+            document.getElementById(ids[index]).textContent = planeta.voltas;
+        }
+    });
+    
+    dados3Lei.tempo += dados3Lei.velocidade;
+    dados3Lei.animId = requestAnimationFrame(animar3Lei);
+}
+
+function iniciar3Lei() {
+    dados3Lei.animando = true;
+    animar3Lei();
+}
+
+function pausar3Lei() {
+    dados3Lei.animando = false;
+    if (dados3Lei.animId) {
+        cancelAnimationFrame(dados3Lei.animId);
+    }
+}
+
+function resetar3Lei() {
+    dados3Lei.tempo = 0;
+    dados3Lei.planetas.forEach((planeta, index) => {
+        planeta.angulo = 0;
+        planeta.voltas = 0;
+        planeta.voltasAnterior = -1;
+        
+        const ids = ['voltasMercurio', 'voltasVenus', 'voltasTerra', 'voltasMarte'];
+        document.getElementById(ids[index]).textContent = '0';
+    });
+    pausar3Lei();
+    desenhar3Lei();
+}
+
+function mudarVelocidade3Lei(delta) {
+    dados3Lei.velocidade = Math.max(2, Math.min(40, dados3Lei.velocidade + delta));
+    document.getElementById('velocidade3Lei').textContent = dados3Lei.velocidade + 'x';
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializar3Lei);
+} else {
+    setTimeout(inicializar3Lei, 100);
+}
+</script>
+
+</body>
+</html>
